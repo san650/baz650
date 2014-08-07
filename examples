@@ -22,8 +22,8 @@ bzr init --quiet tmp/
 # create empty file
 touch tmp/a_file.txt
 
-# remove other versions of baz
-unset baz
+# remove other versions of baz function
+unset -f baz
 
 # code under test
 source baz.bash
