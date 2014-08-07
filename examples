@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# How to run this
+# ```
+# . examples
+# ```
+# or to less more verbose ouput
+# ```
+# PS4='${LINENO}: ' bash -x examples
+# ```
+echo 'Preparing sandbox'
+
+# create sandbox folder
+if [ -d tmp ]; then
+  rm -R tmp
+fi
+
+mkdir tmp
+
+# create bazaar branch
+bzr init --quiet tmp/
+
+# create empty file
+touch tmp/a_file.txt
+
+# remove other versions of baz
+unset baz
+
+# code under test
+source baz.bash
+
+# helpers
+function it {
+  echo ' > '"$1"
+}
+
+function fail {
+  echo ' fail!'
+}
+
+echo 'Running tests...'
+
+#-----------------------------
+it 'finds baz command'
+
+# test if command exists
+command -v baz >/dev/null 2>&1 || {
+  fail
+  exit 1
+}
+
+#-----------------------------
+it 'fordwards commands to bzr'
+
+read -r -d '' EXPECTED <<'EOT'
+unknown:
+  a_file.txt
+EOT
+
+OUTPUT=$(baz show)
+
+if [ "$OUTPUT" != "$EXPECTED" ]; then
+  fail
+fi
+
+#-----------------------------
+
+echo 'Done.'
